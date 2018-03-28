@@ -503,7 +503,7 @@ int mrmailbox_configure_and_connect(mrmailbox_t* mailbox)
 				{
 
 				if( i = 1 ) {
-					char* url = mr_mprintf("http://autoconfig.%s/mail/config-v1.1.xml?emailaddress=%s", param_domain, param_addr_urlencoded); /* Probe http using only generic url (not sending email address to random servers)*/
+					char* url = mr_mprintf("http://autoconfig.%s/mail/config-v1.1.xml", param_domain); /* Probe http using only generic url (not sending email address to random servers)*/
 					param_autoconfig = moz_autoconfigure(mailbox, url, param);
 					if( param_autoconfig ) {	/* http probing was successful */
 						char* url = mr_mprintf("http://autoconfig.%s/mail/config-v1.1.xml?emailaddress=%s", param_domain, param_addr_urlencoded); /* override using http and personal url */
