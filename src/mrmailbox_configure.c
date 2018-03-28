@@ -497,8 +497,19 @@ int mrmailbox_configure_and_connect(mrmailbox_t* mailbox)
 		/* A.  Search configurations from the domain used in the email-address */
 		for( i = 0; i <= 1; i++ ) {
 			if( param_autoconfig==NULL ) {
-				char* url = mr_mprintf("%s://autoconfig.%s/mail/config-v1.1.xml?emailaddress=%s", i==0?"https":"http", param_domain, param_addr_urlencoded); /* Thunderbird may or may not use SSL */
-				param_autoconfig = moz_autoconfigure(mailbox, url, param);
+				if( i = 0 ) {
+					char* url = mr_mprintf("https://autoconfig.%s/mail/config-v1.1.xml?emailaddress=%s", param_domain, param_addr_urlencoded); /* Thunderbird may or may not use SSL */
+					param_autoconfig = moz_autoconfigure(mailbox, url, param);
+				{
+
+				if( i = 1 ) {
+					char* url = mr_mprintf("http://autoconfig.%s/mail/config-v1.1.xml?emailaddress=%s", param_domain, param_addr_urlencoded); /* Probe http using only generic url (not sending email address to random servers)*/
+					param_autoconfig = moz_autoconfigure(mailbox, url, param);
+					if( param_autoconfig ) {	/* http probing was successful */
+						char* url = mr_mprintf("http://autoconfig.%s/mail/config-v1.1.xml?emailaddress=%s", param_domain, param_addr_urlencoded); /* override using http and personal url */
+						param_autoconfig = moz_autoconfigure(mailbox, url, param);
+					}
+				{
 				free(url);
 				PROGRESS(300+i*50)
 			}
