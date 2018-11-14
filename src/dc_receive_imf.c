@@ -269,9 +269,11 @@ static void calc_timestamps(dc_context_t* context, uint32_t chat_id, uint32_t fr
 	/* get last_msg_time from all other messages (including SELF) as the MINIMUM ;
 	used to force fresh messages popping up at the end of the list:
 		* for sort_timestamp of delayed messages, if message_timestamp predates a later message
-		* for sort_timestamp, if the local system time has been turned back (e.g. after a reset)
-	(we do this check only for fresh messages, other messages may pop up whereever,
-	 this may happen eg. when restoring old messages or synchronizing different clients) */
+			(we do this check only for fresh messages, other messages may pop up whereever,
+	 		this may happen eg. when restoring old messages or synchronizing different clients)
+		* for sort_timestamp, to limit the impact if the local system time has been turned back (e.g. after a reset)
+	*/
+
 	sqlite3_stmt* stmt = dc_sqlite3_prepare(context->sql,
 		"SELECT MAX(timestamp) FROM msgs WHERE chat_id=? and from_id!=? AND timestamp>=?");
 	sqlite3_bind_int  (stmt,  1, chat_id);
@@ -302,7 +304,7 @@ static void calc_timestamps(dc_context_t* context, uint32_t chat_id, uint32_t fr
 		*sort_timestamp = dc_create_smeared_timestamp(context);
 	}
 	
-	/* in case system time has been turned back and thus the last step truncated too much,
+	/* in case system time has been turned back, and thus the last step truncated too much,
 	   at least ensure to sort to the end of existing messages */
 	if (*rcvt_timestamp < last_msg_time) {
 		*sort_timestamp = last_msg_time+1; /* this may result in several messages having the same
